@@ -2,19 +2,45 @@
 //
 
 #include <iostream>
+#include <stdio.h>
+#include <string.h>
 
 
-int max(int a, int b)
-{
- 
-    return (a > b) ? a : b;
-}
+#pragma warning(push)
+#pragma warning(disable:4146)
+
+#import "C:\Program Files\Common Files\System\ado\msado15.dll" no_namespace rename("EOF", "EndOfFile")
+#pragma warning(pop)
+
 
 int main()
 {
-    int a = 100; 
-    int b = 200; 
+	_ConnectionPtr pCon = NULL;
+	_RecordsetPtr  pRS = NULL; 
+	char str[255]; 
 
-    printf("max value is : %d", max(a, b));
+	strcpy_s(str, "driver={SQL Server; server = 127.0.0.1;");
+	strcat_s(str, "uid=super;pwd=Winnipeg1; database = temp;");
+
+	CoInitialize(NULL);
+	pCon.CreateInstance(__uuidof(Connection));
+
+	pCon->Open(str, "", "", 0);
+	pRS = pCon->Execute("SELECT * FROM test", NULL, adOptionUnspecified);
+
+	while (pRS->EndOfFile == FALSE)
+	{
+		printf("%s\n", (LPCTSTR)(_bstr_t)pRS->GetCollect(L"XXX"));
+		pRS->MoveNext();
+	}
+
+	pRS->Close();
+	pCon->Close();
+
+	pRS = NULL; 
+	pCon = NULL; 
+	CoUninitialize();
+
+
 }
 
